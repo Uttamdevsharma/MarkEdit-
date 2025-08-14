@@ -9,7 +9,8 @@ const Preview = ({ value, imageMap, previewRef }) => {
 
   return (
     <div className="h-full flex flex-col border-t border-gray-300 mb-4">
-      <div ref={previewRef} className="p-4 pl-12 flex-1 overflow-auto prose">
+      <div ref={previewRef} className="p-4 preview-pane flex-1 overflow-auto prose">
+
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           

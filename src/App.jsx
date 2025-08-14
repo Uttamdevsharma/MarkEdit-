@@ -11,9 +11,61 @@ import html2canvas from 'html2canvas';
 import './App.css';
 
 const App = () => {
-  const [markdown, setMarkdown] = useLocalStorage('markdown', '# Hello, Markdown!\n\nDrag and drop an image here.');
-  const [imageMap, setImageMap] = useState({}); // Stores { uniqueId: File }
-  const [objectUrlMap, setObjectUrlMap] = useState({}); // Stores { uniqueId: objectURL }
+  // Default markdown content
+  const [markdown, setMarkdown] = useLocalStorage('markdown', `# Markdown Syntax Guide
+
+## Headers
+
+# Heading h1
+## Heading h2
+###### Heading h6
+
+## Emphasis
+
+*Italic text*  
+**Bold text**  
+_You **can** combine them_
+
+## Lists
+
+### Unordered
+* Item 1
+* Item 2
+    * Subitem 2a
+    * Subitem 2b
+
+### Ordered
+1. Item 1
+2. Item 2
+
+## Images
+![Sample Image](/image/sample.webp "Sample")
+
+## Links
+[Markdown Live Preview](https://markdownlivepreview.com/)
+
+## Blockquotes
+> Markdown is lightweight markup language.
+
+## Tables
+| Left | Right |
+|------|-------|
+| Foo  | Bar   |
+| Baz  | Qux   |
+
+## Code
+\`\`\`js
+console.log('Hello World');
+\`\`\`
+
+Inline code: \`console.log()\`
+`);
+
+  const [imageMap, setImageMap] = useState({});
+  const [objectUrlMap, setObjectUrlMap] = useState({});
+  const [showTableModal, setShowTableModal] = useState(false);
+  const insertTextRef = useRef(null);
+  const previewRef = useRef(null);
 
   const handleImageDrop = (uniqueId, file) => {
     setImageMap(prevMap => ({ ...prevMap, [uniqueId]: file }));
@@ -21,12 +73,7 @@ const App = () => {
     setObjectUrlMap(prevMap => ({ ...prevMap, [uniqueId]: url }));
   };
 
-  const [showTableModal, setShowTableModal] = useState(false);
-  const insertTextRef = useRef(null);
-  const previewRef = useRef(null);
-
   useEffect(() => {
-    // Cleanup object URLs when component unmounts or imageMap changes
     return () => {
       Object.values(objectUrlMap).forEach(url => URL.revokeObjectURL(url));
     };
@@ -94,12 +141,10 @@ const App = () => {
       setShowTableModal(true);
       return;
     }
-
     if (type === 'download-md') {
       handleDownloadMarkdown();
       return;
     }
-
     if (type === 'download-pdf') {
       handleDownloadPdf();
       return;
@@ -132,7 +177,7 @@ const App = () => {
         if (url) {
           newText = selectedText ? `[${selectedText}](${url})` : `[Text](${url})`;
         } else {
-          newText = selectedText; // If no URL is entered, don't change the text
+          newText = selectedText;
         }
         break;
       case 'code-block':
@@ -151,15 +196,17 @@ const App = () => {
       <Toolbar onButtonClick={handleToolbarClick} />
       <div className="flex-1">
         <Allotment>
-          <Editor value={markdown} onChange={setMarkdown} onImageDrop={handleImageDrop} onInsertText={insertTextRef} />
+          <Editor
+            value={markdown}
+            onChange={setMarkdown}
+            onImageDrop={handleImageDrop}
+            onInsertText={insertTextRef}
+          />
           <Preview value={markdown} imageMap={objectUrlMap} previewRef={previewRef} />
         </Allotment>
       </div>
       {showTableModal && (
-        <TableModal
-          onClose={() => setShowTableModal(false)}
-          onInsertTable={handleInsertTable}
-        />
+        <TableModal onClose={() => setShowTableModal(false)} onInsertTable={handleInsertTable} />
       )}
     </div>
   );
