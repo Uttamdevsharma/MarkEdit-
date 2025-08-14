@@ -1,8 +1,27 @@
 
 import React, { useRef, useEffect } from 'react';
 
-const Editor = ({ value, onChange, onImageDrop }) => {
+const Editor = ({ value, onChange, onImageDrop, onInsertText }) => {
   const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (onInsertText) {
+      onInsertText.current = (textToInsert) => {
+        const textarea = textareaRef.current;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+
+        const newValue = value.substring(0, start) + textToInsert + value.substring(end);
+        onChange(newValue);
+
+        setTimeout(() => {
+          textarea.selectionStart = start + textToInsert.length;
+          textarea.selectionEnd = start + textToInsert.length;
+          textarea.focus();
+        }, 0);
+      };
+    }
+  }, [value, onChange, onInsertText]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -31,7 +50,7 @@ const Editor = ({ value, onChange, onImageDrop }) => {
   };
 
   return (
-    <div className="h-full" onDragOver={handleDragOver} onDrop={handleDrop}>
+    <div className="h-full border-t border-gray-300 mb-4" onDragOver={handleDragOver} onDrop={handleDrop}>
       <textarea
         ref={textareaRef}
         className="w-full h-full p-4 border-r border-gray-300 resize-none focus:outline-none"

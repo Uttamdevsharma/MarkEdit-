@@ -1,54 +1,15 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 
-const Preview = ({ value, imageMap }) => {
-  const previewRef = useRef(null);
-
-  const handleDownloadMD = () => {
-    const blob = new Blob([value], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'README.md';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleDownloadPDF = () => {
-    const input = previewRef.current;
-    html2canvas(input).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF();
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save('markdown.pdf');
-    });
-  };
+const Preview = ({ value, imageMap, previewRef }) => {
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="bg-gray-200 p-2 flex justify-end">
-        <button
-          className="mr-2 px-3 py-1 bg-gray-300 rounded"
-          onClick={handleDownloadMD}
-        >
-          Download .md
-        </button>
-        <button
-          className="px-3 py-1 bg-gray-300 rounded"
-          onClick={handleDownloadPDF}
-        >
-          Download .pdf
-        </button>
-      </div>
-      <div ref={previewRef} className="p-4 border-t border-gray-300 flex-1 overflow-auto prose">
+    <div className="h-full flex flex-col border-t border-gray-300 mb-4">
+      <div ref={previewRef} className="p-4 pl-12 flex-1 overflow-auto prose">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           
@@ -88,3 +49,4 @@ const Preview = ({ value, imageMap }) => {
 };
 
 export default Preview;
+

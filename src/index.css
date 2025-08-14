@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.allotment-separator {
+  background-color: #e2e8f0; /* A light gray color */
+  width: 2px; /* Make it thin */
+}
